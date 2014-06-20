@@ -6,7 +6,7 @@ import random as r
 
 class HighThroughput(object):
 
-    def __init__(self, n, system_size, sequencing_size):
+    def __init__(self, sequences, system_size, sequencing_size):
         """
         Modules necessary to run a simulation of high through-put experiment
 
@@ -17,7 +17,7 @@ class HighThroughput(object):
         sequencing_size: int
             Number of protein that can be experimentally sequenced.
         """
-        self.n = n
+        self.sequences = sequences
         self.system_size = system_size
         self.sequencing_size = sequencing_size
 
@@ -46,12 +46,15 @@ class HighThroughput(object):
         seq = sequences.keys()
         system = list()
         frequencies = dict()
+        for s in seq:
+            frequencies[s] = 0
+            
         for i in range(system_size):
             s = seq[r.randint(0,len(sequences)-1)]
             system.append(s)
             frequencies[s] = frequencies[s] + 1
 
-        return sys, frequencies
+        return system, frequencies
         
     def sequencing(self, sequences, system, sequencing_size=None):
         """
@@ -93,9 +96,9 @@ class HighThroughput(object):
         
         print "Completed Screening."
         
-        return sequences, screened_system, frequencies
+        return screened_system, frequencies
         
-    def run_screening(self, n, ref_string, system_size=None, sequencing_size=None):
+    def run_experiment(self, sequences, system_size=None, sequencing_size=None):
         """
         """
         if system_size is None:
@@ -104,15 +107,15 @@ class HighThroughput(object):
             sequencing_size = self.sequencing_size
         
         # Build the initial system of sequences    
-        seq, sys, freq = self.build_system(n, system_size)
+        sys, freq = self.build_system(sequences, system_size)
         
         # Sequence this system with our limited sequencing size
-        samp0= self.sequencing(seq, sys, ref_string, sequencing_size)
+        samp0 = self.sequencing(sequences, sys, sequencing_size)
         
         # Screen the system and store new system
-        seq, sc_sys, sc_freq = self.screening(seq, sys, ref_string)
+        sc_sys, sc_freq = self.screening(sequences, sys)
         
         # Sequence the screened system
-        samp1 = self.sequencing(seq, sc_sys, ref_string, sequencing_size)
+        samp1 = self.sequencing(sequences, sc_sys, sequencing_size)
         
-        return seq, sys, freq, samp0, sc_sys, sc_freq, samp1
+        return sys, freq, samp0, sc_sys, sc_freq, samp1

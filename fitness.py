@@ -18,7 +18,7 @@ class FitnessFunctions(object):
     def gumbel_distribution(self):
         return exp(-exp(-x) - x)
         
-    def nk_model(self, n, k, distribution, *args):
+    def nk_model_fitness(self, n, k, distribution, *args):
         """Returns a k"""
         # generate nk model fitness table
         nk_table = dict()

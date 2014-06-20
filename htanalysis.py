@@ -9,9 +9,31 @@ class HighThroughputAnalysis(object):
     def __init__(self):
         pass
         
-    def kmer_counting(self, char, k, frequencies, strict=False):
+    def kmer_counting(self, char, kmer, frequencies):
+        """ Count the frequency of particular kmer """
+        
+        if char is not '0' and char is not '1':
+            raise NameError('char must be "0" or "1"')
+        
+        sequences = frequencies.keys()            
+        contributions = list()
+        for s in sequences:
+            for index in kmer:
+                if s[int(index)-1] is not char:
+                    keep = True
+                else:
+                    keep = False
+                    break
+            if keep is True:
+                contributions.append(frequencies[s])
+        freq_total = sum(contributions)
+        
+        return freq_total
+            
+    
+    def k_order_counting(self, char, k, frequencies):
         """
-        Count the frequency of particular kmer sequences
+        Count the frequency of all k_order sequences
         
         Parameter:
         ---------
@@ -28,6 +50,7 @@ class HighThroughputAnalysis(object):
             Dictionary with kmer frequencies. A kmer is a string with all combinations
             of char in the sequence.
         """
+        
         if char is not '0' and char is not '1':
             raise NameError('char must be "0" or "1"')
             
@@ -41,17 +64,7 @@ class HighThroughputAnalysis(object):
         kmers = [list(r) for r in it.combinations(initial, k)]
         
         for i in range(len(kmers)):
-            contributions = list()
-            for s in sequences:
-                for index in kmers[i]:
-                    if s[int(index)-1] is not char:
-                        keep = True
-                    else:
-                        keep = False
-                        break
-                if keep is True:
-                    contributions.append(frequencies[s])
-            kmer["".join(kmers[i])] = sum(contributions)
+            kmer["".join(kmers[i])] = self.kmer_counting(char, kmers[i], frequencies)
             
         return kmer
 

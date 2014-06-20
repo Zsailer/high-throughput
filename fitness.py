@@ -10,22 +10,36 @@ class FitnessFunctions(object):
         pass
         
     def normal_distribution(self, x, center, sigma):
+        """ Returns a normal distribution """
         #sigma squared is the variance
         if sigma is None:
                 sigma = 2
-        return exp(-((x-center)**2)/(2*sigma**2))
+        if isinstance(x,(list,ndarray)):
+            y = list()
+            for i in x:
+                y.append(exp(-((i-center)**2)/(2*float(sigma)**2)))
+            return y
+        else:
+            return exp(-((x-center)**2)/(2*float(sigma)**2))
         
-    def gumbel_distribution(self):
-        return exp(-exp(-x) - x)
-        
-    def nk_model_fitness(self, n, k, distribution, *args):
-        """Returns a k"""
+    def gumbel_distribution(self, x, center):
+        """ Returns a gumbel_distribution """
+        if isinstance(x,(list,ndarray)):
+            y = list()
+            for i in x:
+                y.append(exp(-exp(-i) - i))
+            return y
+        else:
+            return exp(-exp(-x) - x)
+                    
+    def nk_model_fitness(self, n, k, distribution):
+        """ Returns an nk fitness distribution """
         # generate nk model fitness table
         nk_table = dict()
         interactions = ["".join(r) for r in it.product('01', repeat=k)]
         for s in interactions:
             m = s.count('1')
-            f = distribution(m,k,.5)
+            f = distribution(m,k,.7)
             nk_table[s] = f
 
         sequences = [list("".join(r)) for r in it.product('01', repeat=n)]

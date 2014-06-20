@@ -56,18 +56,18 @@ class HighThroughputAnalysis(object):
         return kmer
 
 
-    def k_order_contribution(self, k, freq0, freq1):
+    def k_order_contribution(self, k, freq):
         """
         Compares the freq0/freq1 to k order.
         """
-        kmer0 = self.kmer_counting('0', k, freq0)
-        kmer1 = self.kmer_counting('1', k, freq1)
-        
+        kmer0 = self.kmer_counting('0', k, freq)        
+        kmer1 = self.kmer_counting('1', k, freq)
+
         kmer_contribution = dict()
         # Calculate the ratio of frequencies f0/f1
         for k in kmer0:
             kmer_contribution[k] = float(kmer1[k])/float(kmer0[k])
-            
+
         return kmer_contribution
 
 

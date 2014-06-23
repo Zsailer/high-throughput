@@ -12,15 +12,16 @@ class FitnessFunctions(object):
     def normal_distribution(self, x, center, sigma):
         """ Returns a normal distribution """
         #sigma squared is the variance
+        height = .2
         if sigma is None:
                 sigma = 2
         if isinstance(x,(list,ndarray)):
             y = list()
             for i in x:
-                y.append(exp(-((i-center)**2)/(2*float(sigma)**2)))
+                y.append(height*exp(-((i-center)**2)/(2*float(sigma)**2)))
             return y
         else:
-            return exp(-((x-center)**2)/(2*float(sigma)**2))
+            return height*exp(-((x-center)**2)/(2*float(sigma)**2))
         
     def gumbel_distribution(self, x, center):
         """ Returns a gumbel_distribution """
@@ -31,15 +32,15 @@ class FitnessFunctions(object):
             return y
         else:
             return exp(-exp(-x) - x)
-                    
-    def nk_model_fitness(self, n, k, distribution):
+
+    def nk_fitness(self, n, k, distribution):
         """ Returns an nk fitness distribution """
         # generate nk model fitness table
         nk_table = dict()
         interactions = ["".join(r) for r in it.product('01', repeat=k)]
         for s in interactions:
             m = s.count('1')
-            f = distribution(m,k,.7)
+            f = distribution(m,k,.4)
             nk_table[s] = f
 
         sequences = [list("".join(r)) for r in it.product('01', repeat=n)]
@@ -94,3 +95,24 @@ class FitnessFunctions(object):
             sequences["".join(seq)] = r.random()
             frequencies[s] = 0
         return sequences, frequencies
+        
+    def bias_interactions(self, interactions, fitness):
+        """ Add bias to particular interactions """
+
+        for interaction in interactions:
+            bias = list()
+            for sequence in fitness:
+                for i in interaction:
+                    if sequence[int(i)-1] is '1':
+                        keep = True
+                    else:
+                        keep = False
+                        break
+                if keep is True:
+                    bias.append(sequence)
+            for b in bias:
+                fitness[b] = (1-fitness[b])*interactions[interaction] + fitness[b]
+                
+        return fitness
+                
+        

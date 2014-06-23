@@ -19,7 +19,7 @@ class HighThroughputAnalysis(object):
         contributions = list()
         for s in sequences:
             for index in kmer:
-                if s[int(index)-1] is not char:
+                if s[int(index)-1] is char:
                     keep = True
                 else:
                     keep = False
@@ -73,13 +73,15 @@ class HighThroughputAnalysis(object):
         """
         Compares the freq0/freq1 to k order.
         """
-        kmer0 = self.kmer_counting('0', k, freq)        
-        kmer1 = self.kmer_counting('1', k, freq)
+        kmer0 = self.k_order_counting('0', k, freq)        
+        kmer1 = self.k_order_counting('1', k, freq)
 
         kmer_contribution = dict()
+        #reference_seq = "".zfill(len(kmer0.keys()[0]))
+        #normalization = float(kmer0[reference_seq])/float(kmer1[reference_seq])
         # Calculate the ratio of frequencies f0/f1
         for k in kmer0:
-            kmer_contribution[k] = float(kmer1[k])/float(kmer0[k])
+            kmer_contribution[k] = float(kmer1[k])#/float(kmer0[k])*normalization
 
         return kmer_contribution
 

@@ -3,6 +3,7 @@ import itertools as it
 from numpy import *
 from math import *
 import random as r
+import heapq as h
 
 class HighThroughputAnalysis(object):
     
@@ -77,8 +78,6 @@ class HighThroughputAnalysis(object):
         kmer1 = self.k_order_counting('1', k, freq)
 
         kmer_contribution = dict()
-        #reference_seq = "".zfill(len(kmer0.keys()[0]))
-        #normalization = float(kmer0[reference_seq])/float(kmer1[reference_seq])
         # Calculate the ratio of frequencies f0/f1
         for k in kmer0:
             kmer_contribution[k] = float(kmer1[k])#/float(kmer0[k])*normalization
@@ -86,7 +85,7 @@ class HighThroughputAnalysis(object):
         return kmer_contribution
 
 
-    def k_system_calculation(self, k, freq_before, freq_after):
+    def k_system_calculation(self, k, freq):
         """
         Determine all interactions between sites to k order
         
@@ -94,12 +93,9 @@ class HighThroughputAnalysis(object):
         ----------
         k: int
             The highest order interaction to calculate.
-        freq_before: dict
+        freq: dict
             A dictionary which holds sequence-frequency (key,value) pair for initial
             comparison (i.e. before a high-throughput screening).
-        freq_after: dict
-            A dictionary which holds sequence-frequency (key,value) pair for final
-            comparison (i.e. after a high-throughput screening).
         
         Return:
         ------
@@ -109,7 +105,8 @@ class HighThroughputAnalysis(object):
         """        
         system = dict()
         for i in range(1,k+1):
-            system[str(i)] = self.k_order_contribution(i, freq_before, freq_after)
+            system[str(i)] = self.k_order_contribution(i, freq)
+            
         return system
 
 
@@ -138,3 +135,34 @@ class HighThroughputAnalysis(object):
         
         total_freq = sum(list_freq)
         return freq_func, list_freq, total_freq
+     
+    def site_interactions(self, k, site, freq):
+        """ Specify a site and return all kmer interactions """
+        kmer_freqs = self.k_system_calculation(k, freq)
+        monomers = kmer_freqs['1']
+        
+        contributions = dict()
+        for i in range(2, k+1):
+            kmers = kmer_freqs[str(i)]
+            contributions[str(i)] = dict()
+            for key in kmers.keys():
+                if str(site) in key:
+                    contributions[str(i)][key] = float(kmers[key])/monomers[str(i)]
+        
+        return contributions
+        
+    def strongest_site_interactions(self, top_tier, k, site, freq):
+        """ Find the strongest (top-tier fraction) kmer interations """
+        site_stuff = self.site_interactions(k, site, freq)
+        
+        strongest = dict()
+        for i in range(2, len(site_stuff)+1):
+            strongest[str(i)] = dict()
+            top = int(len(site_stuff[str(i)])*top_tier)
+            vals = h.nlargest(top, site_stuff[str(i)].values())
+            keys = [site_stuff[str(i)].keys()[site_stuff[str(i)].values().index(v)] for v in vals]
+            for j in range(len(keys)):
+                strongest[str(i)][keys[j]] = vals[j]
+                
+        return strongest
+

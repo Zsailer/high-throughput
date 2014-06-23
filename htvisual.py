@@ -73,7 +73,7 @@ class HighThroughputVisualization(object):
         kmer_plot = plt.bar(x_marks, seq_values, align='center', alpha=0.7, color='blue')
         plt.xticks(x_marks, seq_labels, rotation=50)
         
-        plt.title('Frequency of sequences with k-order interaction', fontsize=self.title_size)
+        plt.title('Frequency of sequences with '+ str(len(seq_labels[0])) + '-mer present', fontsize=self.title_size)
         plt.ylabel('Frequency ratio ($f_1/f_0$)', fontsize=self.y_label_size)
         
         return kmer_plot

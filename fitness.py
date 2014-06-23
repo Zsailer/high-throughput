@@ -40,8 +40,8 @@ class FitnessFunctions(object):
         interactions = ["".join(r) for r in it.product('01', repeat=k)]
         for s in interactions:
             m = s.count('1')
-            f = distribution(m,k,.4)
-            nk_table[s] = f
+            val = distribution(m,k,.4)
+            nk_table[s] = val
 
         sequences = [list("".join(r)) for r in it.product('01', repeat=n)]
 
